@@ -13,26 +13,16 @@ public class client extends Thread{
 
     @Override
     public void run(){  //thread per la ricezione dei messaggi
-        try {
-            while (true){
+        
+        while (true){
+            try {
                 System.out.println(in.readLine());
-            }
-        } catch (IOException e) {
-            // TODO Auto-generated catch block
+            } catch (IOException e) {
+                System.out.println("Errore nella ricezione del messaggio");
+                }
         }
 
     }
-
-
-     public static void spegni(){
-            off=true;
-            try {
-                in.close();
-                out.close();
-                if(!client.isClosed()) client.close();
-            } catch (IOException e) {/*ignora*/}
-        }
-
 
 
 
@@ -68,6 +58,16 @@ public class client extends Thread{
         }catch(IOException e){spegni();}
   
     }
+
+
+    public static void spegni(){
+            off=true;
+            try {
+                in.close();
+                out.close();
+                if(!client.isClosed()) client.close();
+            } catch (IOException e) {/*ignora*/}
+        }
 
    
 }
