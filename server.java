@@ -8,6 +8,7 @@ public class server extends Thread{
 
         @Override
         public void run() {
+            //ricezione messaggi
             BufferedReader in;
             //output sul client
             PrintWriter out;
@@ -16,21 +17,22 @@ public class server extends Thread{
             client = connessioni.elementAt(id);
             id++;
             
-            try{
+            try{ 
                 out=new PrintWriter(client.getOutputStream(),true);
                 in = new BufferedReader(new InputStreamReader(client.getInputStream()));
                 out.println("Inserire un nome: ");
                 nome = in.readLine();
-                System.out.println(nome + " connesso");
+                System.out.println(nome + "si è connesso");
                 while (true){
                     String messaggio= in.readLine();
                     for (int i=0; i<connessioni.size();i++){
                         Socket g= new Socket();
                         g=connessioni.elementAt(i);
                         //broadcast a tutti i client eccetto il mittente
-                        if ((g!=null)&&(g!=client)) {
-                            out.println(nome+": "+messaggio);
-                            out.flush();
+                        if (g!=client) {
+                            messaggio=nome+": "+messaggio;
+                            out.println(messaggio);
+                            salvataggio(messaggio);
                         }
                     }
                 }
@@ -46,7 +48,6 @@ public class server extends Thread{
             System.out.println("Server in ascolto sulla porta locale di benvenuto: "+ socketBenvenuto.getLocalPort());
             
             
-
             while (true) {
                 server t= new server();
                 Socket client = socketBenvenuto.accept();
@@ -61,14 +62,12 @@ public class server extends Thread{
 
 
 
+
+
+
 /**
  * //scrittura file
-        try{
-            FileWriter scrittore= new FileWriter("storico.txt");
-            PrintWriter scrivi= new PrintWriter(scrittore);
-            scrivi.println("ciao\nciao");
-            scrittore.close();
-        }catch (Exception e){}
+        
 
 
 //lettura file
@@ -86,7 +85,14 @@ public class server extends Thread{
  */
     }//main
 
-
+    public static void salvataggio (String messaggio){
+            try{
+            FileWriter scrittore= new FileWriter("storico.txt");
+            PrintWriter scrivi= new PrintWriter(scrittore);
+            scrivi.println(messaggio);
+            scrittore.close();
+        }catch (Exception e){}
+            }
 
     
 
