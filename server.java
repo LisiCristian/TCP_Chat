@@ -22,7 +22,7 @@ public class server extends Thread{
                 in = new BufferedReader(new InputStreamReader(client.getInputStream()));
                 out.println("Inserire un nome: ");
                 nome = in.readLine();
-                System.out.println(nome + "si è connesso");
+                System.out.println(nome + " si è connesso");
                 while (true){
                     String messaggio= in.readLine();
                     for (int i=0; i<connessioni.size();i++){
