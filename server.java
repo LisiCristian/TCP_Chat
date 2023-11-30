@@ -6,6 +6,11 @@ public class server extends Thread{
     static Vector<Socket> connessioni = new Vector<Socket>();
     int id=0;
 
+    public server(){
+        start();
+        
+    }
+
         @Override
         public void run() {
             //ricezione messaggi
@@ -49,11 +54,11 @@ public class server extends Thread{
             
             
             while (true) {
-                server t= new server();
+                
                 Socket client = socketBenvenuto.accept();
                 connessioni.add(client);
                 System.out.println("Connessione accettata, socket client: " + client);
-                t.start();
+                new server();
             }    
         } catch (IOException e) { 
             System.out.println("Accept fallito");
