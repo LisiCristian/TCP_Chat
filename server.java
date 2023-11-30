@@ -4,27 +4,31 @@ import java.util.*;
 
 public class server extends Thread{
     static Vector<Socket> connessioni = new Vector<Socket>();
+    //ricezione messaggi
+    BufferedReader in;
+    //output sul client
+    PrintWriter out;
     int id=0;
 
-    public server(){
+    public server(Socket client){
+        connessioni.add(client);
+       try{
+        out=new PrintWriter(new BufferedWriter(new OutputStreamWriter(client.getOutputStream())),true);
+        in = new BufferedReader(new InputStreamReader(client.getInputStream()));
+       }catch (IOException e) {}
         start();
         
     }
 
         @Override
         public void run() {
-            //ricezione messaggi
-            BufferedReader in;
-            //output sul client
-            PrintWriter out;
             String nome;
             Socket client;
             client = connessioni.elementAt(id);
             id++;
             
             try{ 
-                out=new PrintWriter(client.getOutputStream(),true);
-                in = new BufferedReader(new InputStreamReader(client.getInputStream()));
+                
                 out.println("Inserire un nome: ");
                 nome = in.readLine();
                 System.out.println(nome + " si è connesso");
@@ -56,9 +60,9 @@ public class server extends Thread{
             while (true) {
                 
                 Socket client = socketBenvenuto.accept();
-                connessioni.add(client);
+                
                 System.out.println("Connessione accettata, socket client: " + client);
-                new server();
+                new server(client);
             }    
         } catch (IOException e) { 
             System.out.println("Accept fallito");
