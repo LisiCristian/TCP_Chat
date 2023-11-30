@@ -9,7 +9,9 @@ public class client extends Thread{
     static boolean off;
 
 
-
+    public client(){
+        start();
+    }
 
     @Override
     public void run(){  //thread per la ricezione dei messaggi
@@ -41,8 +43,8 @@ public class client extends Thread{
 
 
             System.out.println("Client Socket: "+ client);
-            client  t=new client();
-            t.start();
+            new client();
+
 
 
             // creazione stream di input da tastiera
