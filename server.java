@@ -8,44 +8,73 @@ public class server extends Thread{
     BufferedReader in;
     //output sul client
     PrintWriter out;
-    int id=0;
+    static int id=0;
 
     public server(Socket client){
-        connessioni.add(client);
+        connessioni.addElement(client);
+        System.out.println("Grandezza dell'array: "+connessioni.size());
        try{
         out=new PrintWriter(new BufferedWriter(new OutputStreamWriter(client.getOutputStream())),true);
         in = new BufferedReader(new InputStreamReader(client.getInputStream()));
        }catch (IOException e) {}
         start();
-        
     }
 
         @Override
         public void run() {
             String nome;
             Socket client;
-            client = connessioni.elementAt(id);
-            id++;
-            
+            boolean chiudi=false;
+            //prendiamo dal vettore il client che invia il messaggio e incrementiamo la variabile id 
+            client = connessioni.elementAt(id++); 
+                //System.out.println(client + " " + id);
             try{ 
-                
-                out.println("Inserire un nome: ");
+                out.println("Inserire un nome: "); //se non viene inserito un nome valido non si può accedere alla chat
                 nome = in.readLine();
                 System.out.println(nome + " si è connesso");
-                while (true){
+                while (chiudi==false){
                     String messaggio= in.readLine();
-                    for (int i=0; i<connessioni.size();i++){
-                        Socket g= new Socket();
-                        g=connessioni.elementAt(i);
+                    if (messaggio.equals("/esci")){
+                        chiudi=true;
+                        break;
+                    }
+                    for (int i=0; i<connessioni.size(); i++){
+                        Socket destinatario= new Socket();
+                        destinatario=connessioni.elementAt(i);
+                                    //System.out.println("Numero i: "+i+" Socket: "+ destinatario);
                         //broadcast a tutti i client eccetto il mittente
-                        if (g!=client) {
-                            messaggio=nome+": "+messaggio;
-                            out.println(messaggio);
-                            salvataggio(messaggio);
+                        if (destinatario!=client) {
+                           new PrintWriter(destinatario.getOutputStream(),true).println(nome + ": " + messaggio);
+                            salvataggio(nome + ": " + messaggio);
                         }
                     }
                 }
-            }catch(IOException e) {}
+                if (chiudi==true) {
+                    System.out.println("Chiuso");
+                    chiudiClient(client,in,out);
+                }
+            }catch(Exception e) {
+                chiudiClient(client,in,out);
+            }
+            
+        }
+
+
+        public void uscitaChat (){
+            connessioni.remove(this);
+        }
+
+
+
+        public void chiudiClient (Socket client, BufferedReader in, PrintWriter out){
+            uscitaChat();
+            try{
+                if (in!=null) in.close();
+                if (out!=null) out.close();
+                if (client!=null) client.close();
+            }catch (Exception e){
+                //TODO: gestire 
+            }
         }
 
 
@@ -68,6 +97,7 @@ public class server extends Thread{
             System.out.println("Accept fallito");
             System.exit(1);
             }
+
 
 
 
