@@ -6,8 +6,8 @@ public class client extends Thread{
     static Socket client;
     static BufferedReader in;
     static PrintWriter out;
-    static boolean off;
-
+    static boolean off=false;
+    
 
     public client(){
         start();
@@ -16,11 +16,12 @@ public class client extends Thread{
     @Override
     public void run(){  //thread per la ricezione dei messaggi
         
-        while (true){
+        while (off==false){
             try {
                 System.out.println(in.readLine());
             } catch (IOException e) {
                 System.out.println("Errore nella ricezione del messaggio");
+                spegni();
                 }
         }
 
@@ -49,15 +50,21 @@ public class client extends Thread{
 
             // creazione stream di input da tastiera
             BufferedReader syn = new BufferedReader(new InputStreamReader(System.in));
-            while (!off){   //ciclo fino a quando il client non decide di disconnettersi
+            boolean first=true;
+            while (off==false){   //ciclo fino a quando il client non decide di disconnettersi
+                //if (first==false) System.out.print("Scrivi: ");
+                //else first=false;
                 String messaggio = syn.readLine();
+                out.println(messaggio);
                 if (messaggio.equals("/esci")){
+                    System.out.println("Chiusura...");
                     syn.close();
                     spegni();
                 }
-                out.println(messaggio);
             }
-        }catch(IOException e){spegni();}
+        }catch(IOException e){
+            spegni();
+        }
   
     }
 
@@ -67,7 +74,7 @@ public class client extends Thread{
             try {
                 in.close();
                 out.close();
-                if(!client.isClosed()) client.close();
+                if(client!=null) client.close();
             } catch (IOException e) {/*ignora*/}
         }
 
