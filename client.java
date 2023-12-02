@@ -49,13 +49,21 @@ public class client extends Thread{
 
 
             // creazione stream di input da tastiera
+            boolean scrivi=true;
             BufferedReader syn = new BufferedReader(new InputStreamReader(System.in));
             boolean first=true;
             while (off==false){   //ciclo fino a quando il client non decide di disconnettersi
-                //if (first==false) System.out.print("Scrivi: ");
-                //else first=false;
+                if ((first==false) && (scrivi==true)) System.out.println("Scrivi: ");
+                else first=false;
+                if (scrivi==false) {
+                    System.out.print("Storico: \n");
+                scrivi=true;
+            }
                 String messaggio = syn.readLine();
                 out.println(messaggio);
+                if (messaggio.toLowerCase().equals("/storico")) {
+                    scrivi=false;
+                }
                 if (messaggio.equals("/esci")){
                     System.out.println("Chiusura...");
                     syn.close();
