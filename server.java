@@ -1,3 +1,4 @@
+//Dopo la chiusura di un client, gli altri riusciranno a comunicare, ma non si connettono nuovi client
 import java.io.*;
 import java.net.*;
 import java.util.*;
@@ -63,17 +64,15 @@ public class server extends Thread{
         }
 
 
-        public void uscitaChat (){
-            connessioni.remove(this);
-            id--;
-            connessioni.trimToSize();
+        public void uscitaChat (Socket client){
+            connessioni.removeElement(client);
         }
 
 
 
 
         public void chiudiClient (Socket client, BufferedReader in, PrintWriter out){
-            uscitaChat();
+            uscitaChat(client);
             try{
                 if (in!=null) in.close();
                 if (out!=null) out.close();
