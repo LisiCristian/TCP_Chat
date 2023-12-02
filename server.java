@@ -38,19 +38,22 @@ public class server extends Thread{
                         chiudi=true;
                         break;
                     }
-                    for (int i=0; i<connessioni.size(); i++){
-                        Socket destinatario= new Socket();
-                        destinatario=connessioni.elementAt(i);
-                                    //System.out.println("Numero i: "+i+" Socket: "+ destinatario);
-                        //broadcast a tutti i client eccetto il mittente
-                        if (destinatario!=client) {
-                           new PrintWriter(destinatario.getOutputStream(),true).println(nome + ": " + messaggio);
-                            salvataggio(nome + ": " + messaggio);
+                    if (messaggio.toLowerCase().equals("/storico")){
+                        storico(out);
+                    }else{
+                        for (int i=0; i<connessioni.size(); i++){
+                            Socket destinatario= new Socket();
+                            destinatario=connessioni.elementAt(i);
+                            //broadcast a tutti i client eccetto il mittente
+                            if (destinatario!=client) {
+                            new PrintWriter(destinatario.getOutputStream(),true).println(nome + ": " + messaggio);
+                            }
                         }
-                    }
+                        if(!messaggio.toLowerCase().equals("/storico"))  salvataggio(nome + ": " + messaggio);
+                    } 
                 }
                 if (chiudi==true) {
-                    System.out.println("Chiuso");
+                    System.out.println(nome+"Chiuso");
                     chiudiClient(client,in,out);
                 }
             }catch(Exception e) {
@@ -62,7 +65,10 @@ public class server extends Thread{
 
         public void uscitaChat (){
             connessioni.remove(this);
+            id--;
+            connessioni.trimToSize();
         }
+
 
 
 
@@ -105,36 +111,39 @@ public class server extends Thread{
 
 
 /**
- * //scrittura file
+ * 
         
 
 
-//lettura file
+
+ */
+    }//main
+
+    //scrittura file
+    public static void salvataggio (String messaggio){
+        try{
+            FileWriter scrittore= new FileWriter("storico.txt",true);
+            PrintWriter scrivi= new PrintWriter(scrittore);
+            scrivi.println(messaggio);
+            scrittore.close();
+        }catch (Exception e){}
+    }
+
+    
+    //lettura file
+    public static void storico(PrintWriter out){
         try{
             BufferedReader in=new BufferedReader(new FileReader("storico.txt"));
             String line = in.readLine();
             //ciclo fino a qunado il file non è vuoto
             while (line!=null){
-                System.out.println(line);
+                out.println(line);
                 line = in.readLine();
-
             }  
-            in.close();      
+            in.close();
+            out.println("\nScrivi: ");      
         }catch (Exception e){}
- */
-    }//main
-
-    public static void salvataggio (String messaggio){
-            try{
-            FileWriter scrittore= new FileWriter("storico.txt");
-            PrintWriter scrivi= new PrintWriter(scrittore);
-            scrivi.println(messaggio);
-            scrittore.close();
-        }catch (Exception e){}
-            }
-
-    
-
+    }
 
 
 }
