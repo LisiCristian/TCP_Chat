@@ -1,6 +1,7 @@
-//Dopo la chiusura di un client, gli altri riusciranno a comunicare, ma non si connettono nuovi client
 import java.io.*;
 import java.net.*;
+import java.time.*;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 
 public class server extends Thread{
@@ -26,13 +27,13 @@ public class server extends Thread{
             String nome;
             Socket client;
             boolean chiudi=false;
-            //prendiamo dal vettore il client che invia il messaggio e incrementiamo la variabile id 
-            client = connessioni.elementAt(id++); 
-                //System.out.println(client + " " + id);
+            int myId = id++; // Memorizza l'id del thread corrente e incrementiamo la variabile id 
+            //prendiamo dal vettore il client che invia il messaggio
+            client = connessioni.elementAt(myId); 
             try{ 
                 out.println("Inserire un nome: "); //se non viene inserito un nome valido non si può accedere alla chat
                 nome = in.readLine();
-                System.out.println(nome + " si è connesso");
+                System.out.println(nome + " connesso");
                 while (chiudi==false){
                     String messaggio= in.readLine();
                     if (messaggio.equals("/esci")){
@@ -47,43 +48,42 @@ public class server extends Thread{
                             destinatario=connessioni.elementAt(i);
                             //broadcast a tutti i client eccetto il mittente
                             if (destinatario!=client) {
-                            new PrintWriter(destinatario.getOutputStream(),true).println(nome + ": " + messaggio);
+                                new PrintWriter(destinatario.getOutputStream(),true).println(nome + ": " + messaggio);
                             }
                         }
-                        if(!messaggio.toLowerCase().equals("/storico"))  salvataggio(nome + ": " + messaggio);
+                        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("hh:mm:ss dd/MM/yyyy").withZone(ZoneId.of("Europe/Rome")).withLocale(Locale.ITALY);
+                        LocalDateTime dataora = LocalDateTime.of(LocalDate.now(), LocalTime.now());
+                        if(!messaggio.toLowerCase().equals("/storico"))  salvataggio(nome + ": " + messaggio +" <"+dataora.format(formatter)+">");
                     } 
                 }
                 if (chiudi==true) {
-                    System.out.println(nome+"Chiuso");
-                    chiudiClient(client,in,out);
+                    System.out.println(nome+" disconnesso");
+                    chiudiClient(client,in,out,myId);
                 }
             }catch(Exception e) {
-                chiudiClient(client,in,out);
+                chiudiClient(client,in,out,myId);
             }
-            
         }
 
 
-        public void uscitaChat (Socket client){
-            connessioni.removeElement(client);
+        public void uscitaChat (int myId){
+            connessioni.removeElementAt(myId);
+
         }
 
 
-
-
-        public void chiudiClient (Socket client, BufferedReader in, PrintWriter out){
-            uscitaChat(client);
+        public void chiudiClient (Socket client, BufferedReader in, PrintWriter out,int myId){
+            uscitaChat(myId);
             try{
                 if (in!=null) in.close();
                 if (out!=null) out.close();
                 if (client!=null) client.close();
             }catch (Exception e){
-                //TODO: gestire 
+                //ignora
             }
         }
 
 
-    
     public static void main (String [] args) throws IOException{
         try {
             ServerSocket socketBenvenuto = new ServerSocket();
@@ -102,21 +102,8 @@ public class server extends Thread{
             System.out.println("Accept fallito");
             System.exit(1);
             }
+    }//fine main
 
-
-
-
-
-
-
-/**
- * 
-        
-
-
-
- */
-    }//main
 
     //scrittura file
     public static void salvataggio (String messaggio){
@@ -134,7 +121,7 @@ public class server extends Thread{
         try{
             BufferedReader in=new BufferedReader(new FileReader("storico.txt"));
             String line = in.readLine();
-            //ciclo fino a qunado il file non è vuoto
+            //ciclo fino a quando il file non è vuoto
             while (line!=null){
                 out.println(line);
                 line = in.readLine();
