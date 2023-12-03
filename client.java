@@ -20,7 +20,7 @@ public class client extends Thread{
             try {
                 System.out.println(in.readLine());
             } catch (IOException e) {
-                System.out.println("Errore nella ricezione del messaggio");
+                System.out.println("Errore nella ricezione dal server");
                 spegni();
                 }
         }
@@ -38,10 +38,7 @@ public class client extends Thread{
             // creazione stream di output dal socket
             out= new PrintWriter(client.getOutputStream(), true);
             
-
             in = new BufferedReader(new InputStreamReader(client.getInputStream()));
-
-
 
             System.out.println("Client Socket: "+ client);
             new client();
@@ -83,6 +80,7 @@ public class client extends Thread{
                 in.close();
                 out.close();
                 if(client!=null) client.close();
+                System.out.println("Client disconnesso.");
             } catch (IOException e) {/*ignora*/}
         }
 
