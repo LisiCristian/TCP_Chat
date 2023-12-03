@@ -6,35 +6,38 @@ import java.util.*;
 
 public class server extends Thread{
     static Vector<Socket> connessioni = new Vector<Socket>();
-    //ricezione messaggi
-    BufferedReader in;
-    //output sul client
-    PrintWriter out;
+    static Vector<String> nomi = new Vector<String>();
+    BufferedReader in;  //ricezione messaggi
+    PrintWriter out;    //output sul client
     static int id=0;
 
     public server(Socket client){
         connessioni.addElement(client);
-        System.out.println("Grandezza dell'array: "+connessioni.size());
        try{
         out=new PrintWriter(new BufferedWriter(new OutputStreamWriter(client.getOutputStream())),true);
         in = new BufferedReader(new InputStreamReader(client.getInputStream()));
        }catch (IOException e) {}
-        start();
+        start();    // Avvio del thread
     }
 
         @Override
-        public void run() {
+        public void run() {     //thread che gestisce l'invio dei messaggi di ogni client
             String nome;
             Socket client;
             boolean chiudi=false;
-            int myId = id++; // Memorizza l'id del thread corrente e incrementiamo la variabile id 
-            //prendiamo dal vettore il client che invia il messaggio
-            client = connessioni.elementAt(myId); 
+            int myId = id++;    // Memorizza l'id del thread corrente e incrementiamo la variabile id 
+            client = connessioni.elementAt(myId);   //prendiamo dal vettore il client che invia il messaggio
             try{ 
                 out.println("Inserire un nome: "); //se non viene inserito un nome valido non si può accedere alla chat
                 nome = in.readLine();
+                while ((nome.trim().isEmpty())||(nome.contains("/"))||(nomi.contains(nome))){      // Verifica se il nome è vuoto o contiene /
+                    if (!nomi.contains(nome)) out.println("Inserire un nome valido che non contenga \"/\": ");
+                    else out.println("Nome già in uso, reinserire: ");
+                    nome = in.readLine();
+                }
+                nomi.addElement(nome);
                 System.out.println(nome + " connesso");
-                while (chiudi==false){
+                while (chiudi==false){  //ciclo fino a quando il client non si disconnette
                     String messaggio= in.readLine();
                     if (messaggio.equals("/esci")){
                         chiudi=true;
@@ -42,7 +45,8 @@ public class server extends Thread{
                     }
                     if (messaggio.toLowerCase().equals("/storico")){
                         storico(out);
-                    }else{
+                    }
+                    else{
                         for (int i=0; i<connessioni.size(); i++){
                             Socket destinatario= new Socket();
                             destinatario=connessioni.elementAt(i);
@@ -67,14 +71,16 @@ public class server extends Thread{
 
 
         public void uscitaChat (int myId){
-            connessioni.removeElementAt(myId);
-
+            connessioni.removeElementAt(myId); //Rimuove il client dal vettore delle connessioni 
+            nomi.removeElementAt(myId);
+            id--;   //Decrementa l'id per mantenere la coerenza nel vettore
         }
 
 
         public void chiudiClient (Socket client, BufferedReader in, PrintWriter out,int myId){
             uscitaChat(myId);
             try{
+                // Chiude gli stream di input e output e il socket del client
                 if (in!=null) in.close();
                 if (out!=null) out.close();
                 if (client!=null) client.close();
