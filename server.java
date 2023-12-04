@@ -40,7 +40,7 @@ public class server extends Thread{
                 System.out.println(nome + " connesso");
                 while (chiudi==false){  //ciclo fino a quando il client non si disconnette
                     String messaggio= in.readLine();
-                    if (messaggio.equals("/esci")){
+                    if (messaggio.toLowerCase().equals("/esci")){
                         chiudi=true;
                         break;
                     }
@@ -48,21 +48,16 @@ public class server extends Thread{
                         storico(out);
                     }
                     else{
-                        for (int i=0; i<connessioni.size(); i++){
-                            Socket destinatario= new Socket();
-                            destinatario=connessioni.elementAt(i);
-                            //broadcast a tutti i client eccetto il mittente
-                            if (destinatario!=client) {
-                                new PrintWriter(destinatario.getOutputStream(),true).println(nome + ": " + messaggio);
-                            }
-                        }
+                        messaggio= nome + ": " + messaggio;
+                        broadcast (messaggio,client);
                         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("hh:mm:ss dd/MM/yyyy").withZone(ZoneId.of("Europe/Rome")).withLocale(Locale.ITALY);
                         LocalDateTime dataora = LocalDateTime.of(LocalDate.now(), LocalTime.now());
-                        if(!messaggio.toLowerCase().equals("/storico"))  salvataggio(nome + ": " + messaggio +" <"+dataora.format(formatter)+">");
+                        if(!messaggio.toLowerCase().equals("/storico"))  salvataggio(messaggio +" <"+dataora.format(formatter)+">");
                     } 
                 }
                 if (chiudi==true) {
                     System.out.println(nome+" disconnesso");
+                    broadcast(nome+" ha lasciato la chat",client);
                     chiudiClient(client,in,out,myId);
                 }
             }catch(Exception e) {
@@ -90,11 +85,27 @@ public class server extends Thread{
             }
         }
 
+        public static void broadcast (String messaggio, Socket client){
+            for (int i=0; i<connessioni.size(); i++){
+                            Socket destinatario= new Socket();
+                            destinatario=connessioni.elementAt(i);
+                            //broadcast a tutti i client eccetto il mittente
+                            if (destinatario!=client) {
+                                try {
+                                    new PrintWriter(destinatario.getOutputStream(),true).println(messaggio);
+                                } catch (IOException e) {
+                                    // TODO Auto-generated catch block
+                                    e.printStackTrace();
+                                }
+                            }
+                        }
+        }
+
 
     public static void main (String [] args) throws IOException{
         try {
             ServerSocket socketBenvenuto = new ServerSocket();
-            socketBenvenuto.bind(new InetSocketAddress("localhost", 5678));
+            socketBenvenuto.bind(new InetSocketAddress(InetAddress.getLocalHost(),16999));
             System.out.println("Server in ascolto sulla porta locale di benvenuto: "+ socketBenvenuto.getLocalPort());
             
             
