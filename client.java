@@ -29,12 +29,18 @@ public class client extends Thread{
     }
 
 
+
+    public void invio (){
+
+    }
+
+
     public static void main (String[] args) throws IOException{
         try {
             // creazione socket
             System.out.println("Client avviato...");
-            Socket client;
-            client = new Socket("localhost",9999);
+            Socket client= new Socket();
+            client.connect(new InetSocketAddress(InetAddress.getLocalHost(),16999));       //getByName("letsgoski.sytes.net")
             // Creazione degli stream di input e output dal socket
             out= new PrintWriter(client.getOutputStream(), true);
             in = new BufferedReader(new InputStreamReader(client.getInputStream()));
@@ -67,7 +73,8 @@ public class client extends Thread{
                 if (messaggio.toLowerCase().equals("/storico")) {
                     scrivi=false;
                 }
-                if (messaggio.equals("/esci")){
+                if (messaggio.toLowerCase().equals("/esci")){
+                    scrivi=false;
                     System.out.println("Chiusura...");
                     syn.close();
                     spegni();
@@ -83,8 +90,8 @@ public class client extends Thread{
     public static void spegni(){
             off=true;
             try {
-                in.close();
-                out.close();
+                if (in!=null) in.close();
+                if (out!=null) out.close();
                 if(client!=null) client.close();
                 System.out.println("Client disconnesso.");
             } catch (IOException e) {
