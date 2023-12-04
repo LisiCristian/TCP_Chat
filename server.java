@@ -1,4 +1,3 @@
-// Versione finale
 import java.io.*;
 import java.net.*;
 import java.time.*;
@@ -29,6 +28,7 @@ public class server extends Thread{
             int myId = id++;    // Memorizza l'id del thread corrente e incrementiamo la variabile id 
             client = connessioni.elementAt(myId);   //prendiamo dal vettore il client che invia il messaggio
             try{ 
+                out.println("Benvenuto nella chat, puoi usare i comandi:\n/esci per disconetterti.\n/storico per visualizzare lo storico dei messaggi.");
                 out.println("Inserire un nome: "); //se non viene inserito un nome valido non si può accedere alla chat
                 nome = in.readLine();
                 while ((nome.trim().isEmpty())||(nome.contains("/"))||(nomi.contains(nome))){      // Verifica se il nome è vuoto o contiene /
@@ -94,7 +94,7 @@ public class server extends Thread{
     public static void main (String [] args) throws IOException{
         try {
             ServerSocket socketBenvenuto = new ServerSocket();
-            socketBenvenuto.bind(new InetSocketAddress("localhost", 9999));
+            socketBenvenuto.bind(new InetSocketAddress("localhost", 5678));
             System.out.println("Server in ascolto sulla porta locale di benvenuto: "+ socketBenvenuto.getLocalPort());
             
             
