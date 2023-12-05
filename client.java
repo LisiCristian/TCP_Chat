@@ -30,11 +30,6 @@ public class client extends Thread{
 
 
 
-    public void invio (){
-
-    }
-
-
     public static void main (String[] args) throws IOException{
         try {
             // creazione socket
@@ -44,31 +39,39 @@ public class client extends Thread{
             // Creazione degli stream di input e output dal socket
             out= new PrintWriter(client.getOutputStream(), true);
             in = new BufferedReader(new InputStreamReader(client.getInputStream()));
+            BufferedReader syn = new BufferedReader(new InputStreamReader(System.in));
 
             System.out.println("Client Socket: "+ client);
+            System.out.println("Benvenuto nella chat, puoi usare i comandi:\n/esci per disconetterti.\n/storico per visualizzare lo storico dei messaggi.");
+            System.out.println("Inserire un nome: ");
+            String messaggio;
+            do{
+                messaggio = syn.readLine();
+                out.println(messaggio);
+            }while ((messaggio.trim().isEmpty()) || (messaggio.contains("/")) || (in.readLine().equals("false")));
+           
+
+            //se non viene inserito un nome valido non si può accedere alla chat
+                /*while ((messaggio.trim().isEmpty()) || (messaggio.contains("/")) || (in.readLine().equals("false"))) {
+                    messaggio = syn.readLine();
+                    in.readLine();
+                        }*/
             new client();
+            
+            
 
 
 
             boolean scrivi=true;    //booleana per la visualizzazione (o non) sul terminale di "Scrivi:"
-            BufferedReader syn = new BufferedReader(new InputStreamReader(System.in));
-            boolean first=true;     //booleana per identificare il primo messaggio inviato (nome)
             while (off==false){   //ciclo fino a quando il client non decide di disconnettersi
 
-                if ((first==false) && (scrivi==true)) System.out.println("Scrivi: ");   //se non è il primo messaggio inviato visualizza sul terminale "Scrivi:"
+                if (scrivi==true) System.out.println("Scrivi: ");   //se non è il primo messaggio inviato visualizza sul terminale "Scrivi:"
 
                 if ((scrivi==false)) {
                     System.out.print("Storico: \n");
                 scrivi=true;
             }
-                String messaggio = syn.readLine();
-                //controllo validità del nome inserito
-                if (first==true) {
-                    if ((!messaggio.trim().isEmpty()) && (!messaggio.contains("/"))) {
-                        scrivi=true;
-                        first=false;
-                    }
-                }
+                messaggio = syn.readLine();
                 out.println(messaggio);
                 if (messaggio.toLowerCase().equals("/storico")) {
                     scrivi=false;
