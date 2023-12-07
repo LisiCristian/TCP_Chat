@@ -1,3 +1,4 @@
+//Versione finale
 import java.io.*;
 import java.net.*;
 import java.time.*;
@@ -30,8 +31,10 @@ public class server extends Thread{
             try{ 
 
                 nome = in.readLine();
-                while (nomi.contains(nome)){
-                    out.println("false");
+               
+                while (nomi.contains(nome)||(nome.trim().isEmpty())||(nome.contains("/"))){
+                    if (nomi.contains(nome)) out.println("usato");
+                    else if ((nome.trim().isEmpty())||(nome.contains("/"))) out.println("invalido");
                     nome=in.readLine();
                     }  
                 out.println("true");
@@ -73,8 +76,6 @@ public class server extends Thread{
             nomi.removeElementAt(myId);
             id--;   //Decrementa l'id per mantenere la coerenza nel vettore
         }
-
-
         public void chiudiClient (Socket client, BufferedReader in, PrintWriter out,int myId){
             uscitaChat(myId);
             try{
@@ -86,6 +87,7 @@ public class server extends Thread{
                 //ignora
             }
         }
+
 
         public static void broadcast (String messaggio, Socket client){
             for (int i=0; i<connessioni.size(); i++){
@@ -102,6 +104,8 @@ public class server extends Thread{
                             }
                         }
         }
+
+
 
 
     public static void main (String [] args) throws IOException{
