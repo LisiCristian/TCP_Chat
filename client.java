@@ -48,14 +48,12 @@ public class client extends Thread{
             do{
                 messaggio = syn.readLine();
                 out.println(messaggio);
-            }while ((messaggio.trim().isEmpty()) || (messaggio.contains("/")) || (in.readLine().equals("false")));
+                messaggio=in.readLine();
+                if (messaggio.equals("usato")) System.out.println("Nome già usato, reinserire: ");
+                if (messaggio.equals("invalido")) System.out.println("Nome non valido, reinserire: ");
+            }while (!messaggio.equals("true"));
            
 
-            //se non viene inserito un nome valido non si può accedere alla chat
-                /*while ((messaggio.trim().isEmpty()) || (messaggio.contains("/")) || (in.readLine().equals("false"))) {
-                    messaggio = syn.readLine();
-                    in.readLine();
-                        }*/
             new client();
             
             
@@ -65,7 +63,7 @@ public class client extends Thread{
             boolean scrivi=true;    //booleana per la visualizzazione (o non) sul terminale di "Scrivi:"
             while (off==false){   //ciclo fino a quando il client non decide di disconnettersi
 
-                if (scrivi==true) System.out.println("Scrivi: ");   //se non è il primo messaggio inviato visualizza sul terminale "Scrivi:"
+                if (scrivi==true) System.out.println("Scrivi: ");
 
                 if ((scrivi==false)) {
                     System.out.print("Storico: \n");
