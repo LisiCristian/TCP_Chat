@@ -1,4 +1,4 @@
-// Versione finale
+// Versione finale 2
 import java.io.*;
 import java.net.*;
 
@@ -63,11 +63,12 @@ public class client extends Thread{
                     scrivi=true;
                 }
                 messaggio = syn.readLine();
+                if (messaggio.startsWith("/")&&(!messaggio.toLowerCase().equals("/storico"))||(!messaggio.toLowerCase().equals("/esci"))) System.out.println("Comando non riconosciuto.");
                 out.println(messaggio);
                 if (messaggio.toLowerCase().equals("/storico")) {
                     scrivi=false;
-                }
-                if (messaggio.toLowerCase().equals("/esci")){
+                } 
+                else if (messaggio.toLowerCase().equals("/esci")){
                     scrivi=false;
                     System.out.println("Chiusura...");
                     syn.close();
