@@ -1,4 +1,4 @@
-//Versione finale
+//Versione finale 2
 import java.io.*;
 import java.net.*;
 import java.time.*;
@@ -14,7 +14,6 @@ public class server extends Thread{
 
     public server(Socket client){
         this.client = client;
-        //connessioni.addElement(client);
         try{
             out=new PrintWriter(new BufferedWriter(new OutputStreamWriter(this.client.getOutputStream())),true);
             in = new BufferedReader(new InputStreamReader(this.client.getInputStream()));
@@ -60,7 +59,7 @@ public class server extends Thread{
                 chiudiClient(client,in,out, nome);
             }catch(SocketException e) { 
                 chiudiClient(client,in,out,nome); 
-                if(nome != null) System.out.println(nome+" si e' disconneesso");
+                if(nome != null) System.out.println(nome+" disconneesso");
             }
             catch (IOException e){ System.out.println(e);}
         }
