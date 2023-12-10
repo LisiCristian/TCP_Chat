@@ -1,7 +1,6 @@
 // Versione finale
 import java.io.*;
 import java.net.*;
-import java.util.Vector;
 
 public class client extends Thread{
 
@@ -9,7 +8,6 @@ public class client extends Thread{
     static BufferedReader in;
     static PrintWriter out;
     static boolean off=false; //variabile di spegnimento del client
-    static Vector<String> nomi= new Vector<String>();
 
     public client(){
         start();    // Avvia il thread per la ricezione dei messaggi
@@ -19,13 +17,13 @@ public class client extends Thread{
     public void run(){  //thread per la ricezione dei messaggi                     
         while (off==false){
             try {
-                System.out.println(in.readLine());  // Visualizza i messaggi ricevuti dal server
+                String messaggio = in.readLine();
+                if(messaggio!=null) System.out.println(messaggio);  // Visualizza i messaggi ricevuti dal server
             } catch (IOException e) {
                 System.out.println("Errore nella ricezione dal server");
                 spegni();   // Se si verifica un errore, chiude il client
-                }
+            }
         }
-
     }
 
 
@@ -34,7 +32,7 @@ public class client extends Thread{
         try {
             // creazione socket
             System.out.println("Client avviato...");
-            Socket client= new Socket();
+            client= new Socket();
             client.connect(new InetSocketAddress(InetAddress.getLocalHost(),16999));       //getByName("letsgoski.sytes.net")
             // Creazione degli stream di input e output dal socket
             out= new PrintWriter(client.getOutputStream(), true);
@@ -44,31 +42,26 @@ public class client extends Thread{
             System.out.println("Client Socket: "+ client);
             System.out.println("Benvenuto nella chat, puoi usare i comandi:\n/esci per disconetterti.\n/storico per visualizzare lo storico dei messaggi.");
             System.out.println("Inserire un nome: ");
-            String messaggio;
-            do{
+            String messaggio = syn.readLine();
+            while (true){
+                out.println(messaggio); //mandiamo il nome utente
+                messaggio = in.readLine(); //riceviamo la risposta
+                if(messaggio.equals("true")) break;
+                else if (messaggio.equals("usato")) System.out.println("Nome già usato, reinserire: ");
+                else if(messaggio.equals("invalido")) System.out.println("Nome non valido, reinserire: ");
                 messaggio = syn.readLine();
-                out.println(messaggio);
-                messaggio=in.readLine();
-                if (messaggio.equals("usato")) System.out.println("Nome già usato, reinserire: ");
-                if (messaggio.equals("invalido")) System.out.println("Nome non valido, reinserire: ");
-            }while (!messaggio.equals("true"));
-           
+            }
 
             new client();
-            
-            
-
-
 
             boolean scrivi=true;    //booleana per la visualizzazione (o non) sul terminale di "Scrivi:"
             while (off==false){   //ciclo fino a quando il client non decide di disconnettersi
-
                 if (scrivi==true) System.out.println("Scrivi: ");
 
                 if ((scrivi==false)) {
                     System.out.print("Storico: \n");
-                scrivi=true;
-            }
+                    scrivi=true;
+                }
                 messaggio = syn.readLine();
                 out.println(messaggio);
                 if (messaggio.toLowerCase().equals("/storico")) {
@@ -84,21 +77,16 @@ public class client extends Thread{
         }catch(IOException e){
             spegni();
         }
-  
     }
 
-
     public static void spegni(){
-            off=true;
-            try {
-                if (in!=null) in.close();
-                if (out!=null) out.close();
-                if(client!=null) client.close();
-                System.out.println("Client disconnesso.");
-            } catch (IOException e) {
-                //Ignora
-            }
-        }
-
-   
+        off=true;
+        try {
+            if (in!=null) in.close();
+            if (out!=null) out.close();
+            if(client!=null) client.close();
+            System.out.println("Client disconnesso.");
+            System.exit(1);
+        } catch (IOException e) { System.out.println(e); }
+    }
 }
